@@ -131,28 +131,47 @@ export default function Game() { // Added export default
                         {budget > 0
                             ? "💰 Still Cash in the Bank"
                             : "💸 Burned Out"}
-                    </li>
-                </ul>
-                <button
-                    onClick={resetGame}
-                    style={{
-                        // Removed marginTop: 16
-                        padding: "10px 15px",
-                        borderRadius: 6,
-                        backgroundColor: "#4f46e5", // Use main button color for background
-                        color: "#f9fafb", // Use light text color for contrast
-                        border: "none",
-                        fontSize: 14,
-                        cursor: "pointer",
-                        display: "block",
-                        width: "100%",
-                    }}
-                >
-                    🔄 Reset Game
-                </button>
-            </div>
-        );
-    } else {
+                        </li>
+                    </ul>
+                    {/* Container for buttons */}
+                    <div style={{ display: 'flex', gap: '10px', marginTop: '16px' }}>
+                        <button
+                            onClick={resetGame}
+                            style={{
+                                flex: 1, // Share space
+                            padding: "10px 15px",
+                            borderRadius: 6,
+                            backgroundColor: "#4f46e5", // Reverted button color
+                            color: "#f9fafb", // Use light text color for contrast
+                            border: "none",
+                            fontSize: 14,
+                            cursor: "pointer",
+                            // Removed display: "block", width: "100%"
+                        }}
+                        >
+                            🔄 Reset Game
+                        </button>
+                        {/* Added Schedule a Call button */}
+                        <a href="https://www.hirewithpom.com/booking" target="_blank" rel="noopener noreferrer" style={{ flex: 1, textDecoration: 'none' }}> {/* Added link */}
+                            <button
+                                style={{
+                                    width: '100%', // Make button fill the anchor
+                                    padding: "10px 15px",
+                                borderRadius: 6,
+                                backgroundColor: "#10b981", // Different color (e.g., green)
+                                color: "#f9fafb",
+                                border: "none",
+                                fontSize: 14,
+                                    cursor: "pointer",
+                                }}
+                            >
+                                📞 Schedule a Call
+                            </button>
+                        </a>
+                    </div>
+                </div>
+            );
+        } else {
         gameContent = (
             <div>
                 {choices.map((choice, idx) => (

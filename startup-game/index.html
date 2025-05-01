@@ -48,6 +48,7 @@
 
         const choices = [
             {
+
                 label: "🧑‍💼 Hire Locally",
                 impact: { budget: -50000, progress: 10, quality: 10 },
                 description: "Slow but high quality",
@@ -164,23 +165,42 @@
                                 : "💸 Burned Out"}
                         </li>
                     </ul>
-                    <button
-                        onClick={resetGame}
-                        style={{
-                            // Removed marginTop: 16
-                            padding: "10px 15px",
+                    {/* Container for buttons */}
+                    <div style={{ display: 'flex', gap: '10px', marginTop: '16px' }}>
+                        <button
+                            onClick={resetGame}
+                            style={{
+                                flex: 1, // Share space
+                                padding: "10px 15px",
                             borderRadius: 6,
-                            backgroundColor: "#4f46e5", // Use main button color for background
+                            backgroundColor: "#4f46e5", // Reverted button color
                             color: "#f9fafb", // Use light text color for contrast
                             border: "none",
                             fontSize: 14,
                             cursor: "pointer",
-                            display: "block",
-                            width: "100%",
+                            // Removed display: "block", width: "100%"
                         }}
-                    >
-                        🔄 Reset Game
-                    </button>
+                        >
+                            🔄 Reset Game
+                        </button>
+                        {/* Added Schedule a Call button */}
+                        <a href="https://www.hirewithpom.com/booking" target="_blank" rel="noopener noreferrer" style={{ flex: 1, textDecoration: 'none' }}> {/* Added link */}
+                            <button
+                                style={{
+                                    width: '100%', // Make button fill the anchor
+                                    padding: "10px 15px",
+                                borderRadius: 6,
+                                backgroundColor: "#10b981", // Different color (e.g., green)
+                                color: "#f9fafb",
+                                border: "none",
+                                fontSize: 14,
+                                    cursor: "pointer",
+                                }}
+                            >
+                                📞 Schedule a Call
+                            </button>
+                        </a>
+                    </div>
                 </div>
             );
         } else {
@@ -196,9 +216,9 @@
                                 width: "100%",
                                 padding: "12px 16px",
                                 borderRadius: 8,
-                                backgroundColor: "#4f46e5", // Slightly darker purple button
+                                backgroundColor: "#4f46e5", // Reverted button color
                                 color: "#f9fafb", // Lighter text on button
-                                border: "none",
+                                border: "none", // Removed border
                                 textAlign: "center", // Changed from left to center
                                 fontSize: 14,
                                 cursor: "pointer",
@@ -260,11 +280,12 @@
                     color: "#e5e7eb", // Light gray text for container
                     borderRadius: 12,
                     width: 360, // Reverted width back to original
-                    // Removed minHeight from outer container
+                    // Removed display: 'flex', gap: '20px'
                     boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
                     position: 'relative',
                 }}
             >
+                {/* Removed column wrappers, content back in single column */}
                 {/* Removed confetti rendering */}
                 <h2 style={{ textAlign: "center", fontSize: 24, marginBottom: 10, color: "#f9fafb" }}> {/* Lighter title */}
                     Startup Hiring Game
@@ -328,9 +349,8 @@
                 </div>
 
                 {/* Render the determined game content within a wrapper for consistent height */}
-                <div style={{ minHeight: 280 }}> {/* Added wrapper with minHeight */}
-                  {gameContent}
-                </div>
+                {/* Removed outer div wrapper for gameContent */}
+                {gameContent}
 
             </div> // Closing tag for main component div
         ); // Closing parenthesis for return
