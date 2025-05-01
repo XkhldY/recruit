@@ -1,11 +1,11 @@
-import * as React from "react"
+
+import React from 'react';
 
 /**
  * @framerSupportedLayoutWidth auto
  * @framerSupportedLayoutHeight auto
  */
-
-export default function Game() {
+export default function Game() { // Added export default
     const [month, setMonth] = React.useState(1)
     const [budget, setBudget] = React.useState(200000)
     const [progress, setProgress] = React.useState(0)
@@ -13,31 +13,9 @@ export default function Game() {
     const [gameOver, setGameOver] = React.useState(false)
     const [ending, setEnding] = React.useState("")
     const [showTips, setShowTips] = React.useState(false)
-    // Removed showConfetti and confettiPieces state
+    // Removed confetti state
 
-    const initialState = {
-        month: 1,
-        budget: 200000,
-        progress: 0,
-        quality: 50,
-        gameOver: false,
-            ending: "",
-            showTips: false
-            // Removed showConfetti and confettiPieces from initial state
-        };
-
-        const resetGame = () => {
-        setMonth(initialState.month);
-        setBudget(initialState.budget);
-        setProgress(initialState.progress);
-        setQuality(initialState.quality);
-        setGameOver(initialState.gameOver);
-            setEnding(initialState.ending);
-            setShowTips(initialState.showTips);
-            // Removed showConfetti and confettiPieces reset
-        };
-
-        const choices = [
+    const choices = [
         {
             label: "🧑‍💼 Hire Locally",
             impact: { budget: -50000, progress: 10, quality: 10 },
@@ -66,45 +44,198 @@ export default function Game() {
 
     const makeChoice = (impact) => {
         const newBudget = budget + impact.budget
-        const newProgress = Math.min(100, progress + impact.progress) // Cap progress at 100
-        const newQuality = Math.max(0, Math.min(100, quality + impact.quality)) // Clamp quality between 0 and 100
+        const newProgress = progress + impact.progress
+        const newQuality = quality + impact.quality
         const newMonth = month + 1
 
         setBudget(newBudget)
         setProgress(newProgress)
         setQuality(newQuality)
+        // Check for game over conditions *before* setting state for the next turn
+        let isGameOver = false;
+        let endMessage = "";
+
+        if (newProgress >= 100) {
+            isGameOver = true;
+            if (newQuality >= 50) {
+                endMessage = "🎉 You launched your MVP like a pro!";
+            } else {
+                endMessage = "⚠️ You launched, but your tech debt is high.";
+            }
+        } else if (newBudget <= 0) {
+            isGameOver = true;
+            endMessage = "💀 You ran out of money before launching.";
+        } else if (newMonth > 6) {
+            isGameOver = true;
+            endMessage = "💀 You ran out of time before launching.";
+        }
+
+        // Update state
+        setBudget(newBudget)
+        setProgress(newProgress)
+        setQuality(newQuality)
         setMonth(newMonth)
 
-        // Check for game over conditions: month limit, budget depleted, OR progress reaches 100%
-        if (newMonth > 6 || newBudget <= 0 || newProgress >= 100) {
-                setGameOver(true)
-                if (newProgress >= 100 && newQuality >= 50) {
-                    setEnding("🎉 You launched your MVP like a pro!")
-                    // Removed confetti logic
-                } else if (newProgress >= 100) {
-                    setEnding("⚠️ You launched, but your tech debt is high.")
-                } else {
-                setEnding("💀 You ran out of time or money before launching.")
-            }
+        if (isGameOver) {
+            setGameOver(true);
+            setEnding(endMessage);
         }
     }
+
+    const resetGame = () => {
+        setMonth(1)
+        setBudget(200000)
+        setProgress(0)
+        setQuality(50)
+        setGameOver(false)
+        setEnding("")
+        setShowTips(false)
+    }
+
+    // Determine content based on game state
+    let gameContent;
+    if (gameOver) {
+        gameContent = (
+            <div
+                style={{
+                    background: "#f3f4f6", // Change container background to light gray
+                    padding: 20,
+                    borderRadius: 10,
+                    textAlign: "center",
+                    marginTop: 16, // Added margin
+                }}
+            >
+                <p style={{ fontSize: 18, marginBottom: 16, color: "#1f2937" }}>{ending}</p> {/* Added dark text color */}
+                {/* Final status summary */}
+                     <ul
+                        style={{
+                            marginBottom: 16, // Added margin
+                            fontSize: 13,
+                            color: "#1f2937", // Ensure list text is dark gray
+                            textAlign: "center", // Changed from left to center
+                            listStyle: 'none',
+                            paddingLeft: 0
+                        }}
+                >
+                    <li>
+                        {progress >= 100
+                            ? "✅ Finished MVP"
+                            : "❌ Didn’t finish MVP"}
+                    </li>
+                    <li>
+                        {quality >= 50
+                            ? "✅ Solid Codebase"
+                            : "⚠️ Low Tech Quality"}
+                    </li>
+                    <li>
+                        {budget > 0
+                            ? "💰 Still Cash in the Bank"
+                            : "💸 Burned Out"}
+                    </li>
+                </ul>
+                <button
+                    onClick={resetGame}
+                    style={{
+                        // Removed marginTop: 16
+                        padding: "10px 15px",
+                        borderRadius: 6,
+                        backgroundColor: "#4f46e5", // Use main button color for background
+                        color: "#f9fafb", // Use light text color for contrast
+                        border: "none",
+                        fontSize: 14,
+                        cursor: "pointer",
+                        display: "block",
+                        width: "100%",
+                    }}
+                >
+                    🔄 Reset Game
+                </button>
+            </div>
+        );
+    } else {
+        gameContent = (
+            <div>
+                {choices.map((choice, idx) => (
+                    <button
+                        key={idx}
+                        onClick={() => makeChoice(choice.impact)}
+                        style={{
+                            display: "block",
+                            marginBottom: 12,
+                            width: "100%",
+                            padding: "12px 16px",
+                            borderRadius: 8,
+                            backgroundColor: "#4f46e5", // Slightly darker purple button
+                            color: "#f9fafb", // Lighter text on button
+                            border: "none",
+                            textAlign: "center", // Changed from left to center
+                            fontSize: 14,
+                            cursor: "pointer",
+                            boxShadow: "0 2px 4px rgba(0,0,0,0.2)", // Adjusted shadow for dark theme
+                        }}
+                    >
+                        <strong>{choice.label}</strong>
+                        <br />
+                        <span style={{ fontSize: 12, color: "#d1d5db" }}> {/* Lighter description text */}
+                            {choice.description}
+                        </span>
+                    </button>
+                ))}
+                <button
+                        onClick={() => setShowTips(!showTips)}
+                        style={{
+                            marginTop: 8,
+                            background: "transparent",
+                            border: "none",
+                            fontSize: 13,
+                            color: "#9ca3af", // Lighter gray for tips button text
+                            cursor: "pointer",
+                            width: "100%", // Added width
+                            textAlign: "center", // Added text align center
+                        }}
+                    >
+                        ℹ️ What’s the best move?
+                </button>
+                {showTips && (
+                    <div
+                        style={{
+                            fontSize: 12,
+                            background: "#374151", // Darker gray background for tips
+                            padding: 10,
+                            borderRadius: 6,
+                            marginTop: 8,
+                            color: "#f3f4f6", // Light gray text for tips
+                            textAlign: "center", // Added center alignment
+                        }}
+                    >
+                        Freelancers = cheap but risky.
+                        <br />
+                        Local = expensive and slow.
+                        <br />
+                        POM = fast, high-quality, lower cost.
+                    </div>
+                )}
+            </div>
+        );
+    }
+
 
     return (
         <div
             style={{
                 padding: 20,
                 fontFamily: "Inter, sans-serif",
-                backgroundColor: "#f9fafb",
-                borderRadius: 12,
-                maxWidth: 420,
-                boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-                position: 'relative', // Needed for confetti positioning
-                overflow: 'hidden' // Keep overflow hidden in case other elements might overflow
+                backgroundColor: "#1f2937", // Darker gray container background
+                    color: "#e5e7eb", // Light gray text for container
+                    borderRadius: 12,
+                    width: 360, // Reverted width back to original
+                    // Removed minHeight from outer container
+                    boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+                position: 'relative',
             }}
         >
             {/* Removed confetti rendering */}
-
-            <h2 style={{ textAlign: "center", fontSize: 24, marginBottom: 10 }}>
+            <h2 style={{ textAlign: "center", fontSize: 24, marginBottom: 10, color: "#f9fafb" }}> {/* Lighter title */}
                 Startup Hiring Game
             </h2>
 
@@ -116,179 +247,60 @@ export default function Game() {
                     textAlign: "center",
                     marginBottom: 20,
                     fontSize: 14,
-                    color: "#64748b",
+                    color: "#d1d5db", // Lighter description text
                 }}
             >
                 You, the stressed-out founder
             </p>
 
-            {gameOver ? (
+            {/* Stats always visible */}
+            <div
+                style={{
+                    marginBottom: 16,
+                    display: "grid",
+                    gap: 4,
+                    fontSize: 14,
+                    textAlign: "center", // Added center alignment
+                    color: "#e5e7eb", // Light stats text
+                }}
+            >
+                <p>
+                    <strong>📆 Month:</strong> {month} / 6
+                </p>
+                <p>
+                    <strong>💰 Budget:</strong> $
+                    {budget.toLocaleString()}
+                </p>
+                <p>
+                    <strong>📈 Progress:</strong> {progress}%
+                </p>
                 <div
                     style={{
-                        background: "#e0f2fe",
-                        padding: 20,
-                        borderRadius: 10,
-                        textAlign: "center",
+                        background: "#4b5563", // Darker gray progress bar background
+                        height: 8,
+                        borderRadius: 4,
+                        overflow: "hidden",
+                        marginBottom: 8,
                     }}
                 >
-                    <p style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 12 }}>{ending}</p>
-
-                    {/* Removed POM message tied to confetti */}
-
-                    <ul
-                        style={{
-                            marginTop: 16,
-                            fontSize: 13,
-                            color: "#475569",
-                            textAlign: "left",
-                            listStyle: 'none',
-                            paddingLeft: 0
-                        }}
-                    >
-                        <li style={{ marginBottom: 4 }}>
-                            {progress >= 100
-                                ? "✅ Finished MVP"
-                                : "❌ Didn’t finish MVP"}
-                        </li>
-                        <li style={{ marginBottom: 4 }}>
-                            {quality >= 50
-                                ? "✅ Solid Codebase"
-                                : "⚠️ Low Tech Quality"}
-                        </li>
-                        <li>
-                            {budget > 0
-                                ? "💰 Still Cash in the Bank"
-                                : "💸 Burned Out"}
-                        </li>
-                    </ul>
-                    <button
-                        onClick={resetGame}
-                        style={{
-                            marginTop: 20,
-                            padding: "10px 15px",
-                            borderRadius: 8,
-                            backgroundColor: "#9ca3af",
-                            color: "#fff",
-                            border: "none",
-                            fontSize: 14,
-                            cursor: "pointer",
-                            boxShadow: "0 2px 4px rgba(0,0,0,0.08)",
-                            transition: 'background-color 0.2s ease'
-                        }}
-                        onMouseOver={e => e.currentTarget.style.backgroundColor = '#6b7280'}
-                        onMouseOut={e => e.currentTarget.style.backgroundColor = '#9ca3af'}
-                    >
-                        🔄 Play Again
-                    </button>
-                </div>
-            ) : (
-                <div>
                     <div
                         style={{
-                            marginBottom: 16,
-                            display: "grid",
-                            gap: 4,
-                            fontSize: 14,
+                            width: `${progress}%`,
+                            backgroundColor: "#4f46e5",
+                            height: "100%",
                         }}
-                    >
-                        <p>
-                            <strong>📆 Month:</strong> {month} / 6
-                        </p>
-                        <p>
-                            <strong>💰 Budget:</strong> $
-                            {budget.toLocaleString()}
-                        </p>
-                        <p>
-                            <strong>📈 Progress:</strong> {progress}%
-                        </p>
-                        <div
-                            style={{
-                                background: "#e5e7eb",
-                                height: 8,
-                                borderRadius: 4,
-                                overflow: "hidden",
-                                marginBottom: 8,
-                            }}
-                        >
-                            <div
-                                style={{
-                                    width: `${progress}%`,
-                                    backgroundColor: "#4f46e5",
-                                    height: "100%",
-                                    transition: 'width 0.3s ease-in-out' // Smooth progress bar
-                                }}
-                            ></div>
-                        </div>
-                        <p>
-                            <strong>🧪 Quality:</strong> {quality} / 100
-                        </p>
-                    </div>
-
-                    {choices.map((choice, idx) => (
-                        <button
-                            key={idx}
-                            onClick={() => makeChoice(choice.impact)}
-                            style={{
-                                display: "block",
-                                marginBottom: 12,
-                                width: "100%",
-                                padding: "12px 16px",
-                                borderRadius: 8,
-                                backgroundColor: "#6366f1",
-                                color: "#fff",
-                                border: "none",
-                                textAlign: "left",
-                                fontSize: 14,
-                                cursor: "pointer",
-                                boxShadow: "0 2px 4px rgba(0,0,0,0.08)",
-                                transition: 'background-color 0.2s ease'
-                            }}
-                            onMouseOver={e => e.currentTarget.style.backgroundColor = '#4f46e5'}
-                            onMouseOut={e => e.currentTarget.style.backgroundColor = '#6366f1'}
-                        >
-                            <strong>{choice.label}</strong>
-                            <br />
-                            <span style={{ fontSize: 12, color: "#e0e7ff" }}>
-                                {choice.description}
-                            </span>
-                        </button>
-                    ))}
-
-                    <button
-                        onClick={() => setShowTips(!showTips)}
-                        style={{
-                            marginTop: 8,
-                            background: "transparent",
-                            border: "none",
-                            fontSize: 13,
-                            color: "#475569",
-                            cursor: "pointer",
-                            padding: '4px 0' // Add some padding for easier clicking
-                        }}
-                    >
-                        ℹ️ What’s the best move?
-                    </button>
-                    {showTips && (
-                        <div
-                            style={{
-                                fontSize: 12,
-                                background: "#fef9c3",
-                                padding: 10,
-                                borderRadius: 6,
-                                marginTop: 8,
-                                color: "#92400e",
-                                border: '1px solid #fde68a'
-                            }}
-                        >
-                            Freelancers = cheap but risky.
-                            <br />
-                            Local = expensive and slow.
-                            <br />
-                            POM = fast, high-quality, lower cost.
-                        </div>
-                    )}
+                    ></div>
                 </div>
-            )}
-        </div>
-    )
-}
+                <p>
+                    <strong>🧪 Quality:</strong> {quality} / 100
+                </p>
+            </div>
+
+            {/* Render the determined game content within a wrapper for consistent height */}
+            <div style={{ minHeight: 280 }}> {/* Added wrapper with minHeight */}
+              {gameContent}
+            </div>
+
+        </div> // Closing tag for main component div
+    ); // Closing parenthesis for return
+} // Closing brace for Game function
